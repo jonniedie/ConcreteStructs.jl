@@ -1,5 +1,7 @@
 using ConcreteStructs
+using Suppressor
 using Test
+
 
 @concrete struct Plain end
 plain = Plain()
@@ -61,9 +63,13 @@ parameterized_subtyped = ParameterizedSubtyped(:🏦, [1, 2, 3], 4)
 @testset "ConcreteStructs.jl" begin
     @test_throws ErrorException args.a = 2+im
     @test_throws MethodError subtyped_mutable.a = "hi"
-    @test typeof(partial) |> isconcretetype
     @test_throws InexactError constructor_mutable.c = (1.5,)
+
+    @test typeof(partial) |> isconcretetype
     @test typeof(terse_same_type.a) === typeof(terse_same_type.b)
     @test typeof(fully_parameterized.a) |> isconcretetype
     @test eltype(parameterized_subtyped.b) === typeof(parameterized_subtyped.c)
+
+    @test @capture_out(show(stdout, MIME("text/plain"), typeof(terse_same_type))) == "TerseSameType{Complex{Float32}}"
+    @test @capture_out(show(stdout, terse_same_type)) == "TerseSameType(1.0f0 + 1.0f0im, 5.0f0 + 0.0f0im)"
 end

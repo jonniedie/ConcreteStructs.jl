@@ -99,11 +99,11 @@ function _make_concrete(expr)
     return Expr(:struct, maybe_mutable, head, body)
 end
 
-_parse_head(head::Symbol) = (head, [], :(Any))
+_parse_head(head::Symbol) = (_parse_struct_def(head)..., :(Any))
 function _parse_head(head::Expr)
     if head.head === :curly
         super = :(Any)
-        struct_name, type_params = head.args[1], head.args[2:end]
+        struct_name, type_params = _parse_struct_def(head)
     elseif head.head === :(<:)
         super = head.args[2]
         struct_name, type_params = _parse_head(head.args[1])
