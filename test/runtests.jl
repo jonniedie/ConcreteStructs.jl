@@ -1,3 +1,8 @@
+@static if VERSION < v"1.2"
+    using Pkg
+    Pkg.add("Suppressor")
+end
+
 using ConcreteStructs
 using Suppressor
 using Test
