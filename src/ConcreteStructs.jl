@@ -103,7 +103,6 @@ end
 
 # Parse the top line of the struct definition
 _parse_head(head::Symbol) = (_parse_struct_def(head)..., :(Any))
-
 function _parse_head(head::Expr)
     if head.head === :curly
         super = :(Any)
@@ -112,6 +111,7 @@ function _parse_head(head::Expr)
         super = head.args[2]
         struct_name, type_params = _parse_head(head.args[1])
     end
+    
     return (struct_name, type_params, super)
 end
 
@@ -125,7 +125,6 @@ _parse_struct_def(struct_def::Expr) = (struct_def.args[1], struct_def.args[2:end
 # included in the struct header
 _parse_line(line::LineNumberNode) = (line, nothing)
 _parse_line(line::Expr) = (line, nothing)
-
 function _parse_line(line::Symbol)
     T = Symbol("__T_" * string(line))
     return (:($line::$T), T)
