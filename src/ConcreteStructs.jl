@@ -82,6 +82,7 @@ macro concrete(terse, expr)
 end
 
 
+# Parse whole struct definition for the @concrete macro
 function _make_concrete(expr)
     expr isa Expr && expr.head == :struct || error("Invalid usage of @parameterized")
 
@@ -99,7 +100,10 @@ function _make_concrete(expr)
     return Expr(:struct, maybe_mutable, head, body)
 end
 
+
+# Parse the top line of the struct definition
 _parse_head(head::Symbol) = (_parse_struct_def(head)..., :(Any))
+
 function _parse_head(head::Expr)
     if head.head === :curly
         super = :(Any)
@@ -112,12 +116,16 @@ function _parse_head(head::Expr)
 end
 
 
+# Parse the struct name and parameters
 _parse_struct_def(struct_def::Symbol) = (struct_def, [])
 _parse_struct_def(struct_def::Expr) = (struct_def.args[1], struct_def.args[2:end])
 
 
+# Parse a line of the body of the struct def. Returns the line and the type parameter to be
+# included in the struct header
 _parse_line(line::LineNumberNode) = (line, nothing)
 _parse_line(line::Expr) = (line, nothing)
+
 function _parse_line(line::Symbol)
     T = Symbol("__T_" * string(line))
     return (:($line::$T), T)
