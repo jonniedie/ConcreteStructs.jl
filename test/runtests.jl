@@ -1,8 +1,3 @@
-@static if VERSION < v"1.2"
-    using Pkg
-    Pkg.add("Suppressor")
-end
-
 using ConcreteStructs
 using Suppressor
 using Test
@@ -75,8 +70,6 @@ parameterized_subtyped = ParameterizedSubtyped(:🏦, [1, 2, 3], 4)
     @test typeof(fully_parameterized.a) |> isconcretetype
     @test eltype(parameterized_subtyped.b) === typeof(parameterized_subtyped.c)
 
-    @static if VERSION > v"1.2"
-        @test @capture_out(show(stdout, MIME("text/plain"), typeof(fully_parameterized))) == "FullyParameterized{typeof(sin)}"
-        @test @capture_out(show(stdout, fully_parameterized)) == "FullyParameterized(:sine, sin)"
-    end
+    @test @capture_out(show(stdout, MIME("text/plain"), typeof(fully_parameterized))) == "FullyParameterized{typeof(sin)}"
+    @test @capture_out(show(stdout, fully_parameterized)) == "FullyParameterized(:sine, sin)"
 end
