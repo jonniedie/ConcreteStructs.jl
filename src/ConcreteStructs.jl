@@ -67,7 +67,7 @@ macro concrete(expr)
 end
 
 macro concrete(terse, expr)
-    terse isa Symbol && terse == :terse || error("Invalid usage of @parameterized")
+    terse isa Symbol && terse == :terse || error("Invalid usage of @concrete")
     expr = _make_concrete(expr)
     struct_name = expr.args[2].args[1].args[1]
     full_params = "{" * join(expr.args[2].args[1].args[2:end], ",") * "}"
@@ -84,7 +84,7 @@ end
 
 # Parse whole struct definition for the @concrete macro
 function _make_concrete(expr)
-    expr isa Expr && expr.head == :struct || error("Invalid usage of @parameterized")
+    expr isa Expr && expr.head == :struct || error("Invalid usage of @concrete")
 
     maybe_mutable = expr.args[1]
     (struct_name, type_params, super) = _parse_head(expr.args[2])
