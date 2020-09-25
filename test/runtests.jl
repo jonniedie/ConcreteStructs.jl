@@ -48,7 +48,7 @@ terse_same_type = TerseSameType(1+im, 5f0)
     b::B
     FullyParameterized(a, b) = new{typeof(b)}(a, b)
 end
-fully_parameterized = FullyParameterized(:squared, x->x^2)
+fully_parameterized = FullyParameterized(:sine, sin)
 
 @concrete mutable struct ParameterizedSubtyped{T,N,B<:AbstractArray{T,N}} <: AbstractArray{T,N}
     a
@@ -70,6 +70,6 @@ parameterized_subtyped = ParameterizedSubtyped(:🏦, [1, 2, 3], 4)
     @test typeof(fully_parameterized.a) |> isconcretetype
     @test eltype(parameterized_subtyped.b) === typeof(parameterized_subtyped.c)
 
-    @test @capture_out(show(stdout, MIME("text/plain"), typeof(terse_same_type))) == "TerseSameType{Complex{Float32}}"
-    @test @capture_out(show(stdout, terse_same_type)) == "TerseSameType(1.0f0 + 1.0f0im, 5.0f0 + 0.0f0im)"
+    @test @capture_out(show(stdout, MIME("text/plain"), typeof(fully_parameterized))) == "FullyParameterized{typeof(sin)}"
+    @test @capture_out(show(stdout, fully_parameterized)) == "FullyParameterized(:sine, sin)"
 end
