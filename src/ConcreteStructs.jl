@@ -1,8 +1,8 @@
 """
     ConcreteStructs
 
-ConcreteStructs exports the macro `@concrete`, which can be used to make non-concrete structs
-concrete.
+ConcreteStructs exports the macro `@concrete`, which can be used to concretely parameterize
+structs.
 """
 module ConcreteStructs
 
@@ -63,41 +63,115 @@ FGH{Int64,1,Array{Int64,1},Nothing}
 ```
 """
 macro concrete(expr)
-    return _make_concrete(expr) |> esc
+    expr, _ = _concretize(expr)
+    
+    return quote
+        $expr
+    end |> esc
 end
 
 macro concrete(terse, expr)
     terse isa Symbol && terse == :terse || error("Invalid usage of @concrete")
-    expr = _make_concrete(expr)
-    struct_name = expr.args[2].args[1].args[1]
-    full_params = "{" * join(expr.args[2].args[1].args[2:end], ",") * "}"
+    expr, type_params = _concretize(expr)
+    struct_name = expr.args[2].args[1].args[1] |> string
+
+    num_params = length(type_params)
+    terse_string = if num_params == 0
+        struct_name
+    else
+        :($(struct_name) * "{" * join(T.parameters[1:$num_params], ",") * "}")
+    end
 
     return quote
         $expr
-        Base.show(io::IO, ::Type{<:$struct_name}) = print(io, $(string(struct_name)))
-        function Base.show(io::IO, ::MIME"text/plain", T::Type{<:$struct_name})
-            return print(io, $(string(struct_name)) * "{" * join(T.parameters, ",") * "}")
+        function Base.show(io::IO, T::Type{<:$(Symbol(struct_name))})
+            return print(io, $terse_string)
+        end
+        function Base.show(io::IO, ::MIME"text/plain", T::Type{<:$(Symbol(struct_name))})
+            return print(io, $(struct_name) * "{" * join(T.parameters, ",") * "}")
         end
     end |> esc
 end
 
 
 # Parse whole struct definition for the @concrete macro
-function _make_concrete(expr)
+function _concretize(expr)
     expr isa Expr && expr.head == :struct || error("Invalid usage of @concrete")
 
     maybe_mutable = expr.args[1]
-    (struct_name, type_params, super) = _parse_head(expr.args[2])
+    struct_name, type_params, super = _parse_head(expr.args[2])
     line_tuples = _parse_line.(expr.args[3].args)
 
     lines = first.(line_tuples)
-    type_params = (type_params..., filter(x -> x!==nothing, last.(line_tuples))...)
-    struct_type = Expr(:curly, struct_name, type_params...)
+    type_params_full = (type_params..., filter(x -> x!==nothing, last.(line_tuples))...)
+    struct_type = if length(type_params_full) == 0
+        struct_name
+    else
+        Expr(:curly, struct_name, type_params_full...)
+    end
 
     head = Expr(:(<:), struct_type, super)
-    body = Expr(:block, lines...)
 
-    return Expr(:struct, maybe_mutable, head, body)
+    constructor_expr = _make_constructor(struct_name, type_params, type_params_full, lines)
+    body = Expr(:block, lines..., constructor_expr)
+
+    struct_expr = Expr(:struct, maybe_mutable, head, body)
+    
+    return struct_expr, type_params
+end
+
+
+# Make the inner constructor function
+function _make_constructor(struct_name, type_params, type_params_full, lines)
+    field_lines = filter(line -> (!(line isa LineNumberNode) && (line.head === :(::))), lines)
+    args = map(x->x.args, field_lines)
+    vars = first.(args)
+    var_types = last.(args)
+    constructor_params = _get_constructor_params(type_params, var_types)
+    new_params = _strip_super(type_params_full)
+
+    if length(type_params) == length(type_params_full) && all(type_params .== type_params_full)
+        return Expr(:block)
+    elseif length(constructor_params)==0
+        return :(
+            function $struct_name($(field_lines...)) where {$(type_params_full...)}
+                return new{$(new_params...)}($(vars...))
+            end
+        )
+    else
+        return :(
+            function $struct_name{$(constructor_params...)}($(field_lines...)) where {$(type_params_full...)}
+                return new{$(new_params...)}($(vars...))
+            end
+        )
+    end
+end
+
+
+# Get the parameters that are unmatched to variables and need to be annoted in the constructor
+function _get_constructor_params(type_params, var_types)
+    subparams = _get_subparams(type_params)
+    type_params = _strip_super(type_params)
+    var_types = [subparams; _strip_super(var_types)]
+    return setdiff(type_params, var_types)
+end
+
+
+# Strip supertype annotations
+_strip_super(x) = x
+_strip_super(x::Union{Tuple, AbstractVector}) = vcat(_strip_super.(x)...)
+_strip_super(x::Expr) = x.head == :(<:) ? x.args[1] : x
+
+
+# Get the subparameters of supertypes of subtype parameters (sorry)
+_get_subparams(x) = []
+_get_subparams(x::Union{Tuple, AbstractVector}) = vcat(_get_subparams.(x)...)
+function _get_subparams(x::Expr)
+    if x.head === :curly
+        return x.args[2:end]
+    elseif x.head === :(<:)
+        return _get_subparams(x.args[2:end])
+    end
 end
 
 
