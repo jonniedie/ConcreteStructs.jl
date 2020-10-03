@@ -63,19 +63,17 @@ FGH{Int64,1,Array{Int64,1},Nothing}
 ```
 """
 macro concrete(expr)
-    expr, _ = _concretize(expr)
-    
-    return quote
-        $expr
-    end |> esc
+    expr, _, _ = _concretize(expr)
+    return esc(expr)
 end
 
 macro concrete(terse, expr)
     terse isa Symbol && terse == :terse || error("Invalid usage of @concrete")
-    expr, type_params = _concretize(expr)
-    struct_name = expr.args[2].args[1].args[1] |> string
 
+    expr, struct_name, type_params = _concretize(expr)
+    struct_name = string(struct_name)
     num_params = length(type_params)
+    
     terse_string = if num_params == 0
         struct_name
     else
@@ -97,13 +95,13 @@ end
 # Parse whole struct definition for the @concrete macro
 function _concretize(expr)
     expr isa Expr && expr.head == :struct || error("Invalid usage of @concrete")
-
-    maybe_mutable = expr.args[1]
+    
+    is_mutable = expr.args[1]
     struct_name, type_params, super = _parse_head(expr.args[2])
     line_tuples = _parse_line.(expr.args[3].args)
-
     lines = first.(line_tuples)
     type_params_full = (type_params..., filter(x -> x!==nothing, last.(line_tuples))...)
+
     struct_type = if length(type_params_full) == 0
         struct_name
     else
@@ -111,13 +109,11 @@ function _concretize(expr)
     end
 
     head = Expr(:(<:), struct_type, super)
-
     constructor_expr = _make_constructor(struct_name, type_params, type_params_full, lines)
     body = Expr(:block, lines..., constructor_expr)
-
-    struct_expr = Expr(:struct, maybe_mutable, head, body)
+    struct_expr = Expr(:struct, is_mutable, head, body)
     
-    return struct_expr, type_params
+    return struct_expr, struct_name, type_params
 end
 
 

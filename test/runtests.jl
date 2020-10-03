@@ -61,6 +61,9 @@ end
 @concrete struct Plain end
 plain = Plain()
 
+@concrete terse struct PlainTerse end
+plain_terse = PlainTerse()
+
 @concrete struct Args
     a
     b
