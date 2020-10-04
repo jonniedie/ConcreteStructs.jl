@@ -2,7 +2,8 @@
 
 [![Build Status](https://img.shields.io/travis/com/jonniedie/ConcreteStructs.jl)](https://travis-ci.com/jonniedie/ConcreteStructs.jl)
 [![codecov](https://img.shields.io/codecov/c/gh/jonniedie/ConcreteStructs.jl?label=codecov&logo=codecov)](https://codecov.io/gh/jonniedie/ConcreteStructs.jl)
-[![docs-stable-url](https://img.shields.io/badge/docs-dev-blue.svg)](https://jonniedie.github.io/ConcreteStructs.jl/dev)
+[![docs-stable-url](https://img.shields.io/badge/docs-stable-blue.svg)](https://jonniedie.github.io/ConcreteStructs.jl/stable)
+[![docs-dev-url](https://img.shields.io/badge/docs-dev-blue.svg)](https://jonniedie.github.io/ConcreteStructs.jl/dev)
 
 ConcreteStructs.jl exports the macro `@concrete`, which can be used to make non-concrete structs
 concrete without the boilerplate of adding type parameters.
