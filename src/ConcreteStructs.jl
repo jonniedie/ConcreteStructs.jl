@@ -86,7 +86,11 @@ macro concrete(terse, expr)
             return print(io, $terse_string)
         end
         function Base.show(io::IO, ::MIME"text/plain", T::Type{<:$(Symbol(struct_name))})
-            return print(io, $(struct_name) * "{" * join(T.parameters, ",") * "}")
+            if T isa UnionAll
+                return show(io, T)
+            else
+                return print(io, $(struct_name) * "{" * join(T.parameters, ",") * "}")
+            end
         end
     end |> esc
 end
