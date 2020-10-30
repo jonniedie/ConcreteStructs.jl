@@ -1,6 +1,7 @@
 using ConcreteStructs
 using ConcreteStructs: _parse_head, _parse_struct_def, _parse_line
 using ConcreteStructs: _strip_super, _get_subparams, _get_constructor_params
+using LinearAlgebra: Adjoint
 using Suppressor
 using Test
 
@@ -9,7 +10,8 @@ using Test
 
 # Test setup
 line_number_node = LineNumberNode(1)
-annotated_var = :(b::B)
+annotated_abstract = :(b::AbstractFloat)
+annotated_concrete = :(b::Float64)
 struct_name = :(MyStruct)
 sub_typed_params = :(MyStruct{T1,T2<:AbstractVector{T1}})
 sub_typed = :(MyStruct{D} <: Number)
@@ -19,7 +21,10 @@ kitchen_sink = :(MyStruct{T1, T2<:AbstractVector{T1}} <: AbstractVector{T1})
 # Run tests
 @testset "_parse_line" begin
     @test _parse_line(line_number_node) == (line_number_node, nothing)
-    @test _parse_line(annotated_var) == (annotated_var, nothing)
+    # @test _parse_line(annotated_abstract)[1].args[2] != :AbstractFloat
+    # @test _parse_line(annotated_abstract)[2].args[2] == :AbstractFloat
+    @test _parse_line(annotated_concrete)[1].args[2] == :Float64
+    @test _parse_line(annotated_concrete)[2] === nothing
 
     parsed_sym = _parse_line(:a)
     @test parsed_sym[1].args[2] == parsed_sym[2]
@@ -69,6 +74,12 @@ plain = Plain()
     b
 end
 args = Args(1+im, "hi")
+
+@concrete terse struct ArgsTerse <: Number
+    a
+    b
+end
+args_terse = ArgsTerse(1+im, "hi")
 
 @concrete mutable struct SubtypedMutable <: Number
     a
@@ -140,5 +151,19 @@ hanging_type_param2 = HangingTypeParam2{true}(1, 2.0)
     @test eltype(parameterized_subtyped.b) === typeof(parameterized_subtyped.c)
 
     @test @capture_out(show(stdout, MIME("text/plain"), typeof(fully_parameterized))) == "FullyParameterized{typeof(sin)}"
+    @test @capture_out(show(stdout, FullyParameterized)) == "FullyParameterized"
     @test @capture_out(show(stdout, hanging_type_param)) == "HangingTypeParam{true}(1, 2.0)"
+    @test @capture_out(show(stdout, MIME("text/plain"), ArgsTerse)) == "ArgsTerse"
+end
+
+@testset "Issue #3" begin
+    @concrete struct Foo{T<:Real}
+        x::T
+        y<:Real
+        z<:AbstractMatrix{T}
+    end
+
+    foo = Foo(1, 1.0, [1, 2]')
+
+    @test typeof(foo) === Foo{Int, Float64, Adjoint{Int, Vector{Int}}}
 end

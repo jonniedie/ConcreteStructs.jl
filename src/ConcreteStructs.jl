@@ -83,11 +83,15 @@ macro concrete(terse, expr)
     return quote
         $expr
         function Base.show(io::IO, T::Type{<:$(Symbol(struct_name))})
-            return print(io, $terse_string)
+            if T isa UnionAll
+                print(io, $struct_name)
+            else
+                print(io, $(struct_name) * "{" * join(T.parameters[1:$num_params], ",") * "}")
+            end
         end
         function Base.show(io::IO, ::MIME"text/plain", T::Type{<:$(Symbol(struct_name))})
             if T isa UnionAll
-                return show(io, T)
+                return print(io, $struct_name)
             else
                 return print(io, $(struct_name) * "{" * join(T.parameters, ",") * "}")
             end
@@ -198,9 +202,27 @@ _parse_struct_def(struct_def::Expr) = (struct_def.args[1], struct_def.args[2:end
 # Parse a line of the body of the struct def. Returns the line and the type parameter to be
 # included in the struct header
 _parse_line(line::LineNumberNode) = (line, nothing)
-_parse_line(line::Expr) = (line, nothing)
+function _parse_line(line::Expr)
+    field = line.args[1]
+    T = line.args[2]
+
+    if line.head == :(<:)
+        sym = gensym(field)
+        return (:($field::$sym), :($sym<:$T))
+    else
+        return(line, nothing)
+    end
+
+    
+    # if (T isa Symbol && isdefined(Base.Main, T) && !isconcretetype(Base.eval(Base.Main, T))) || T isa Expr
+    #     sym = gensym(field)
+    #     return (:($field::$sym), :($sym<:$T))
+    # else
+    #     return (line, nothing)
+    # end
+end
 function _parse_line(line::Symbol)
-    T = Symbol("__T_" * string(line))
+    T = gensym(line)
     return (:($line::$T), T)
 end
 
