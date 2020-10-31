@@ -127,7 +127,7 @@ end
 
 # Make the inner constructor function
 function _make_constructor(struct_name, type_params, type_params_full, lines)
-    field_lines = filter(line -> (!(line isa LineNumberNode) && (line.head === :(::))), lines)
+    field_lines = filter(line -> ((line isa Expr) && (line.head === :(::))), lines)
     args = map(x->x.args, field_lines)
     vars = first.(args)
     var_types = last.(args)
