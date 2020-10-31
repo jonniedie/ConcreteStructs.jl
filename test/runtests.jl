@@ -88,7 +88,10 @@ end
 subtyped_mutable = SubtypedMutable(3.0, 4f0)
 
 @concrete struct Partial{A}
+    # Hey there, I'm a comment
     a::A
+
+    "And I'm a docsctring"
     b
 end
 partial = Partial(:yo, 1//2)
