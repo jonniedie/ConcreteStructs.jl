@@ -127,7 +127,7 @@ end
 
 # Make the inner constructor function
 function _make_constructor(struct_name, type_params, type_params_full, lines)
-    field_lines = filter(line -> (!(line isa LineNumberNode) && (line.head === :(::))), lines)
+    field_lines = filter(line -> ((line isa Expr) && (line.head === :(::))), lines)
     args = map(x->x.args, field_lines)
     vars = first.(args)
     var_types = last.(args)
@@ -201,7 +201,7 @@ _parse_struct_def(struct_def::Expr) = (struct_def.args[1], struct_def.args[2:end
 
 # Parse a line of the body of the struct def. Returns the line and the type parameter to be
 # included in the struct header
-_parse_line(line::LineNumberNode) = (line, nothing)
+_parse_line(line) = (line, nothing)
 function _parse_line(line::Expr)
     field = line.args[1]
     T = line.args[2]
