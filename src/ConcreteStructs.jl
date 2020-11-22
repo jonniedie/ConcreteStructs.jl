@@ -207,7 +207,7 @@ function _parse_line(line::Expr)
     T = line.args[2]
 
     if line.head == :(<:)
-        sym = gensym(field)
+        sym = Symbol("__T_" * string(field))
         return (:($field::$sym), :($sym<:$T))
     else
         return(line, nothing)
@@ -215,14 +215,14 @@ function _parse_line(line::Expr)
 
     
     # if (T isa Symbol && isdefined(Base.Main, T) && !isconcretetype(Base.eval(Base.Main, T))) || T isa Expr
-    #     sym = gensym(field)
+    #     sym = Symbol("__T_" * string(field))
     #     return (:($field::$sym), :($sym<:$T))
     # else
     #     return (line, nothing)
     # end
 end
 function _parse_line(line::Symbol)
-    T = gensym(line)
+    T = Symbol("__T_" * string(line))
     return (:($line::$T), T)
 end
 
