@@ -1,4 +1,5 @@
 # ConcreteStructs.jl
+![](https://www.flaticon.com/svg/vstatic/svg/2139/2139469.svg?token=exp=1618330448~hmac=5ce0c28315feee45fbc4470245d003fc)
 
 | **Documentation**                                                               | **Build Status**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
@@ -75,3 +76,6 @@ julia> fgh = FGH([1,2,3], 4, nothing)
 julia> typeof(fgh)
 FGH{Int64,1,Array{Int64,1},Nothing}
 ```
+
+## Attributions
+<div>Icons made by <a href="https://www.flaticon.com/authors/skyclick" title="Skyclick">Skyclick</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
