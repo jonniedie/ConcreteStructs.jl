@@ -5,15 +5,16 @@
 | [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![][github-img]][github-url] [![][codecov-img]][codecov-url] |
 
 
-[docs-dev-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-dev-img]: https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square
 [docs-dev-url]: https://jonniedie.github.io/ConcreteStructs.jl/dev
 
-[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg?style=flat-square
 [docs-stable-url]: https://jonniedie.github.io/ConcreteStructs.jl/stable
 
-[github-img]: https://github.com/jonniedie/ConcreteStructs.jl/workflows/CI/badge.svg
+[github-img]: https://img.shields.io/github/workflow/status/jonniedie/ConcreteStructs.jl/CI?style=flat-square
 [github-url]: https://github.com/jonniedie/ConcreteStructs.jl/actions/workflows/CI
-[codecov-img]: https://codecov.io/gh/jonniedie/ConcreteStructs.jl/branch/master/graph/badge.svg
+
+[codecov-img]: https://img.shields.io/codecov/c/github/jonniedie/ConcreteStructs.jl?style=flat-square
 [codecov-url]: https://codecov.io/gh/jonniedie/ConcreteStructs.jl
 
 
