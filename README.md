@@ -1,5 +1,5 @@
 # ConcreteStructs.jl
-![](https://www.flaticon.com/svg/vstatic/svg/2139/2139469.svg?token=exp=1618330448~hmac=5ce0c28315feee45fbc4470245d003fc)
+![](assets/ConcreteStructs_logo.png)
 
 | **Documentation**                                                               | **Build Status**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
@@ -78,4 +78,4 @@ FGH{Int64,1,Array{Int64,1},Nothing}
 ```
 
 ## Attributions
-<div>Icons made by <a href="https://www.flaticon.com/authors/skyclick" title="Skyclick">Skyclick</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+<div>Icon modified from <a href="https://www.flaticon.com/free-icon/building_2139469?term=concrete+building&related_id=2139469&origin=search">Building icon</a> made by <a href="https://www.flaticon.com/authors/skyclick" title="Skyclick">Skyclick</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
