@@ -1,9 +1,21 @@
 # ConcreteStructs.jl
 
-[![Build Status](https://img.shields.io/travis/com/jonniedie/ConcreteStructs.jl)](https://travis-ci.com/jonniedie/ConcreteStructs.jl)
-[![codecov](https://img.shields.io/codecov/c/gh/jonniedie/ConcreteStructs.jl?label=codecov&logo=codecov)](https://codecov.io/gh/jonniedie/ConcreteStructs.jl)
-[![docs-stable-url](https://img.shields.io/badge/docs-stable-blue.svg)](https://jonniedie.github.io/ConcreteStructs.jl/stable)
-[![docs-dev-url](https://img.shields.io/badge/docs-dev-blue.svg)](https://jonniedie.github.io/ConcreteStructs.jl/dev)
+| **Documentation**                                                               | **Build Status**                                                                                |
+|:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
+| [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![][github-img]][github-url] [![][codecov-img]][codecov-url] |
+
+
+[docs-dev-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-dev-url]: https://jonniedie.github.io/ConcreteStructs.jl/dev
+
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://jonniedie.github.io/ConcreteStructs.jl/stable
+
+[github-img]: https://github.com/jonniedie/ConcreteStructs.jl/workflows/CI/badge.svg
+[github-url]: https://github.com/jonniedie/ConcreteStructs.jl/actions/workflows/CI
+[codecov-img]: https://codecov.io/gh/jonniedie/ConcreteStructs.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/jonniedie/ConcreteStructs.jl
+
 
 ConcreteStructs.jl exports the macro `@concrete`, which can be used to make non-concrete structs
 concrete without the boilerplate of adding type parameters.
