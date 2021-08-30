@@ -127,6 +127,7 @@ end
 
 # Make the inner constructor function
 function _make_constructor(struct_name, type_params, type_params_full, lines)
+    lines = map(line->line isa Expr && line.head==:(=) ? line.args[1] : line, lines)
     field_lines = filter(line -> ((line isa Expr) && (line.head === :(::))), lines)
     args = map(x->x.args, field_lines)
     vars = first.(args)
@@ -203,14 +204,26 @@ _parse_struct_def(struct_def::Expr) = (struct_def.args[1], struct_def.args[2:end
 # included in the struct header
 _parse_line(line) = (line, nothing)
 function _parse_line(line::Expr)
-    field = line.args[1]
-    T = line.args[2]
+    assignment = line.head === :(=)
+    annotation = nothing
+    if assignment
+        val = line.args[2]
+        line, annotation = _parse_line(line.args[1])
+    end
 
-    if line.head == :(<:)
-        sym = Symbol("__T_" * string(field))
-        return (:($field::$sym), :($sym<:$T))
+    out = if line isa Expr && line.head === :(<:)
+        field = line.args[1]
+        T = line.args[2]
+        sym = Symbol(:__T_, field)
+        (:($field::$sym), :($sym<:$T))
     else
-        return(line, nothing)
+        (line, annotation)
+    end
+
+    return if assignment
+        (:($(out[1])=$val), out[2])
+    else
+        out
     end
 
     
