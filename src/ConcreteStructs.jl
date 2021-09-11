@@ -64,7 +64,9 @@ FGH{Int64,1,Array{Int64,1},Nothing}
 """
 macro concrete(expr)
     expr, _, _ = _concretize(expr)
-    return esc(expr)
+    return quote
+        $(Base).@__doc__ $expr
+    end |> esc
 end
 
 macro concrete(terse, expr)
@@ -81,7 +83,7 @@ macro concrete(terse, expr)
     end
 
     return quote
-        $expr
+        $(Base).@__doc__ $expr
         function Base.show(io::IO, T::Type{<:$(Symbol(struct_name))})
             if T isa UnionAll
                 print(io, $struct_name)
