@@ -64,9 +64,7 @@ FGH{Int64,1,Array{Int64,1},Nothing}
 """
 macro concrete(expr)
     expr, _, _ = _concretize(expr)
-    return quote
-        $(Base).@__doc__ $expr
-    end |> esc
+    return esc(expr)
 end
 
 macro concrete(terse, expr)
