@@ -81,7 +81,7 @@ macro concrete(terse, expr)
     end
 
     return quote
-        $expr
+        $(Base).@__doc__ $expr
         function Base.show(io::IO, T::Type{<:$(Symbol(struct_name))})
             if T isa UnionAll
                 print(io, $struct_name)

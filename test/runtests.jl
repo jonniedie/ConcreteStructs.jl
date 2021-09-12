@@ -78,7 +78,15 @@ end
 plain = Plain()
 
 @concrete terse struct PlainTerse end
-plain = Plain()
+plain_terse = PlainTerse()
+
+"test"
+@concrete struct PlainDoc end
+plain_doc = PlainDoc()
+
+"test"
+@concrete terse struct PlainTerseDoc end
+plain_terse_doc = PlainTerseDoc()
 
 @concrete struct Args
     a
