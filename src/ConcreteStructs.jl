@@ -102,8 +102,8 @@ end
 
 # Parse whole struct definition for the @concrete macro
 function _concretize(expr)
-    expr isa Expr && expr.head == :struct || error("Invalid usage of @concrete")
-    
+    original_expr, expr = _find_struct_def(expr)
+
     is_mutable = expr.args[1]
     struct_name, type_params, super = _parse_head(expr.args[2])
     line_tuples = _parse_line.(expr.args[3].args)
@@ -121,6 +121,8 @@ function _concretize(expr)
     body = Expr(:block, lines..., constructor_expr)
     struct_expr = Expr(:struct, is_mutable, head, body)
     
+    struct_expr = _apply_original_expr(original_expr, struct_expr)
+
     return struct_expr, struct_name, type_params
 end
 
@@ -239,5 +241,27 @@ function _parse_line(line::Symbol)
     return (:($line::$T), T)
 end
 
+# find the struct def in case its encapsuled in other macros
+# returns full_original_expression, struct_definition_expr
+function _find_struct_def(expr; tl_expr = expr)
+    if expr.head == :struct
+        return tl_expr, expr
+    elseif expr.head == :macrocall
+        return _find_struct_def(expr.args[3]; tl_expr = tl_expr)
+    end
+    return nerror("Invalid usage of @concrete.")
+end
+
+# finds where the struct is defined in original_expr and plugs in struct_expr
+function _apply_original_expr(original_expr, struct_expr)
+    if original_expr.head == :struct
+        original_expr.args = struct_expr.args
+    elseif original_expr.head == :macrocall
+        original_expr.args[3] = _apply_original_expr(original_expr.args[3], struct_expr)
+    else
+        error("Unsupported expression.")
+    end
+    return original_expr
+end
 
 end
