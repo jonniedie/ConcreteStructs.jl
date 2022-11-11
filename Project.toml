@@ -1,7 +1,7 @@
 name = "ConcreteStructs"
 uuid = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 authors = ["Jonnie Diegelman <jonniediegelman@gmail.com> and contributors"]
-version = "0.2.4"
+version = "0.2.5"
 
 [compat]
 julia = "1.1"
